@@ -1,0 +1,29 @@
+site_name: Web-Программирование. Лабораторные работы. Весенний Семестр.
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - def_list
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - attr_list
+theme:
+  name: material
+  features:
+    - toc.follow
+    - toc.integrate
+nav:
+  - Главная: index.md
+  - ЛР2:
+      - Текст лабораторной: lr2/lr2.md
+      - Практика 1: lr2/pr1.md
+      - Практика 2: lr2/pr2.md
+      - Практика 3: lr2/pr3.md
+
