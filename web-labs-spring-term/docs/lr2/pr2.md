@@ -29,14 +29,24 @@ ORM выступала библиотека, интегрированная во
 языке Python. Как и FastAPI содержит подробную [документацию](https://www.sqlalchemy.org/) включая стандартные
 решения для большинства задач.
 
+установка
+
+создание коннектора https://sqlmodel.tiangolo.com/tutorial/create-db-and-table/
+
+создание моделей https://sqlmodel.tiangolo.com/tutorial/create-db-and-table/#create-the-engine
+https://sqlmodel.tiangolo.com/tutorial/connect/create-connected-tables/
+
+@on_startup
+
 ## Запросы
 
-По сранению с Django, FastAPI не требует длительной установки и настройки приложения, чтобы его запустить достаточно
-выполнить несколько простых операций:
+создание, удаление, изменение, мэнитумэни
+https://sqlmodel.tiangolo.com/tutorial/connect/read-connected-data/
+https://sqlmodel.tiangolo.com/tutorial/relationship-attributes/define-relationships-attributes/
 
 ## Миграции. Alembic
-По сранению с Django, FastAPI не требует длительной установки и настройки приложения, чтобы его запустить достаточно
-выполнить несколько простых операций:
+
+тут все понятно
 
 ## Практическое задание
 Машины, миграции
