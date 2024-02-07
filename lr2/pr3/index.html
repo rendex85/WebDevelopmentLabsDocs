@@ -359,9 +359,9 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#_1" class="md-nav__link">
+  <a href="#alembic" class="md-nav__link">
     <span class="md-ellipsis">
-      Асинхронная реализация
+      Миграции. Alembic
     </span>
   </a>
   
@@ -377,7 +377,7 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#_2" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
       Приведение проекта в порядок
     </span>
@@ -386,7 +386,7 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#_3" class="md-nav__link">
+  <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
       Практическое задание
     </span>
@@ -425,20 +425,161 @@
                   
 
 
-<h1 id="23-env-gitignore">Практика 2.3. Асинхронность, ENV, GitIgnore и структура проекта</h1>
+<h1 id="23-env-gitignore">Практика 2.3. Миграции, ENV, GitIgnore и структура проекта</h1>
 <blockquote>
 <p><strong>Для выполнения лабораторной и всех практических работ рекомендуется использовать версию Python 3.10+</strong></p>
 </blockquote>
-<h2 id="_1">Асинхронная реализация</h2>
-<p>По сранению с Django, FastAPI не требует длительной установки и настройки приложения, чтобы его запустить достаточно
-выполнить несколько простых операций:</p>
+<h2 id="alembic">Миграции. Alembic</h2>
+<p>При разработке проекта может возникнуть потребность добавлять новые таблицы или изменять уже существующие. Ввиду того,
+что ORM SQLModel  (и, следовательно, SQLAlchemy) не предусматривает встроенный механизм миграций, необходимо
+использовать готовые библиотеки позволяющие безопасно вносить изменения в таблицы и БД проекта.</p>
+<p>В официальной документации к FastAPI <a href="https://fastapi.tiangolo.com/tutorial/sql-databases/#alembic-note">рекомендуется</a>
+использовать Alembic в качестве библиотеки для менеджмента изменений в базе данных. Эта библиотека разработана специально
+для ORM SQLAlchemy, и совместима с SQLModel.
+Подробнее можно прочитать на <a href="https://alembic.sqlalchemy.org/en/latest/">официальном сайте</a>.</p>
+<p>Для интеграции Alembic в разрабатываемый проект необходимо его установить через пакетный менеджер:
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>pip install alembic  
+</span></code></pre></div></p>
+<p>Реализация механизма миграций происходит через вызов <code>alembic init [name]</code> в командной строке, где [name] — название 
+папки, хранящей настройки миграций. Сгенерируем папку с миграциями и сопутствующие файлы настроек:</p>
+<p><div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>alembic init migrations 
+</span></code></pre></div>
+В корне проекта, помимо ранее созданных файлов должна сформироваться следующая структура:
+<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>migratgions/
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>├─ versions/
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>├─ env.py
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>├─ README
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>├─ script.py.mako
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>alembic.ini
+</span></code></pre></div></p>
+<p>Сгенерировалась папка <code>migratgions</code> хранящая внутри себя папку с файлами миграций <code>versions</code>,
+файл окружения БД <code>env.py</code> и шаблон генерации миграций <code>script.py.mako</code>. В корне проекта добавился файл настроек
+<code>alembic.ini</code></p>
+<p>Для создания миграций в SQLModel необходимо добавить импорты моделей и настроить подключение к БД</p>
+<ol>
+<li>
+<p><strong>В файле <code>alembic.ini</code>  переменной <code>sqlalchemy.url</code> необходимо указать адрес БД, по аналогии с тем, что находится в
+   файле <code>connection.py</code></strong></p>
+</li>
+<li>
+<p><strong>В файле <code>env.py</code> импортировать все из <code>models.py</code>  и в переменной <code>target_metadata</code> указать
+   значение <code>target_metadata=SQLModel.metadata</code></strong></p>
+<details class="abstract">
+<summary>Пример файла</summary>
+<div class="language-py highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">from</span> <span class="nn">logging.config</span> <span class="kn">import</span> <span class="n">fileConfig</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">engine_from_config</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">pool</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="kn">from</span> <span class="nn">alembic</span> <span class="kn">import</span> <span class="n">context</span>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="kn">from</span> <span class="nn">models</span> <span class="kn">import</span> <span class="o">*</span>
+</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>
+</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="c1"># this is the Alembic Config object, which provides</span>
+</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="c1"># access to the values within the .ini file in use.</span>
+</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="n">config</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">config</span>
+</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>
+</span><span id="__span-3-14"><a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a><span class="c1"># Interpret the config file for Python logging.</span>
+</span><span id="__span-3-15"><a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a><span class="c1"># This line sets up loggers basically.</span>
+</span><span id="__span-3-16"><a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a><span class="n">fileConfig</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">config_file_name</span><span class="p">)</span>
+</span><span id="__span-3-17"><a id="__codelineno-3-17" name="__codelineno-3-17" href="#__codelineno-3-17"></a>
+</span><span id="__span-3-18"><a id="__codelineno-3-18" name="__codelineno-3-18" href="#__codelineno-3-18"></a><span class="c1"># add your model&#39;s MetaData object here</span>
+</span><span id="__span-3-19"><a id="__codelineno-3-19" name="__codelineno-3-19" href="#__codelineno-3-19"></a><span class="c1"># for &#39;autogenerate&#39; support</span>
+</span><span id="__span-3-20"><a id="__codelineno-3-20" name="__codelineno-3-20" href="#__codelineno-3-20"></a><span class="c1"># from myapp import mymodel</span>
+</span><span id="__span-3-21"><a id="__codelineno-3-21" name="__codelineno-3-21" href="#__codelineno-3-21"></a><span class="c1"># target_metadata = mymodel.Base.metadata</span>
+</span><span id="__span-3-22"><a id="__codelineno-3-22" name="__codelineno-3-22" href="#__codelineno-3-22"></a><span class="c1">#target_metadata = None</span>
+</span><span id="__span-3-23"><a id="__codelineno-3-23" name="__codelineno-3-23" href="#__codelineno-3-23"></a>
+</span><span id="__span-3-24"><a id="__codelineno-3-24" name="__codelineno-3-24" href="#__codelineno-3-24"></a><span class="n">target_metadata</span> <span class="o">=</span> <span class="n">SQLModel</span><span class="o">.</span><span class="n">metadata</span>
+</span><span id="__span-3-25"><a id="__codelineno-3-25" name="__codelineno-3-25" href="#__codelineno-3-25"></a>
+</span><span id="__span-3-26"><a id="__codelineno-3-26" name="__codelineno-3-26" href="#__codelineno-3-26"></a><span class="c1"># other values from the config, defined by the needs of env.py,</span>
+</span><span id="__span-3-27"><a id="__codelineno-3-27" name="__codelineno-3-27" href="#__codelineno-3-27"></a><span class="c1"># can be acquired:</span>
+</span><span id="__span-3-28"><a id="__codelineno-3-28" name="__codelineno-3-28" href="#__codelineno-3-28"></a><span class="c1"># my_important_option = config.get_main_option(&quot;my_important_option&quot;)</span>
+</span><span id="__span-3-29"><a id="__codelineno-3-29" name="__codelineno-3-29" href="#__codelineno-3-29"></a><span class="c1"># ... etc.</span>
+</span><span id="__span-3-30"><a id="__codelineno-3-30" name="__codelineno-3-30" href="#__codelineno-3-30"></a>
+</span><span id="__span-3-31"><a id="__codelineno-3-31" name="__codelineno-3-31" href="#__codelineno-3-31"></a>
+</span><span id="__span-3-32"><a id="__codelineno-3-32" name="__codelineno-3-32" href="#__codelineno-3-32"></a><span class="k">def</span> <span class="nf">run_migrations_offline</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-3-33"><a id="__codelineno-3-33" name="__codelineno-3-33" href="#__codelineno-3-33"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Run migrations in &#39;offline&#39; mode.</span>
+</span><span id="__span-3-34"><a id="__codelineno-3-34" name="__codelineno-3-34" href="#__codelineno-3-34"></a>
+</span><span id="__span-3-35"><a id="__codelineno-3-35" name="__codelineno-3-35" href="#__codelineno-3-35"></a><span class="sd">    This configures the context with just a URL</span>
+</span><span id="__span-3-36"><a id="__codelineno-3-36" name="__codelineno-3-36" href="#__codelineno-3-36"></a><span class="sd">    and not an Engine, though an Engine is acceptable</span>
+</span><span id="__span-3-37"><a id="__codelineno-3-37" name="__codelineno-3-37" href="#__codelineno-3-37"></a><span class="sd">    here as well.  By skipping the Engine creation</span>
+</span><span id="__span-3-38"><a id="__codelineno-3-38" name="__codelineno-3-38" href="#__codelineno-3-38"></a><span class="sd">    we don&#39;t even need a DBAPI to be available.</span>
+</span><span id="__span-3-39"><a id="__codelineno-3-39" name="__codelineno-3-39" href="#__codelineno-3-39"></a>
+</span><span id="__span-3-40"><a id="__codelineno-3-40" name="__codelineno-3-40" href="#__codelineno-3-40"></a><span class="sd">    Calls to context.execute() here emit the given string to the</span>
+</span><span id="__span-3-41"><a id="__codelineno-3-41" name="__codelineno-3-41" href="#__codelineno-3-41"></a><span class="sd">    script output.</span>
+</span><span id="__span-3-42"><a id="__codelineno-3-42" name="__codelineno-3-42" href="#__codelineno-3-42"></a>
+</span><span id="__span-3-43"><a id="__codelineno-3-43" name="__codelineno-3-43" href="#__codelineno-3-43"></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="__span-3-44"><a id="__codelineno-3-44" name="__codelineno-3-44" href="#__codelineno-3-44"></a>    <span class="n">url</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get_main_option</span><span class="p">(</span><span class="s2">&quot;sqlalchemy.url&quot;</span><span class="p">)</span>
+</span><span id="__span-3-45"><a id="__codelineno-3-45" name="__codelineno-3-45" href="#__codelineno-3-45"></a>    <span class="n">context</span><span class="o">.</span><span class="n">configure</span><span class="p">(</span>
+</span><span id="__span-3-46"><a id="__codelineno-3-46" name="__codelineno-3-46" href="#__codelineno-3-46"></a>        <span class="n">url</span><span class="o">=</span><span class="n">url</span><span class="p">,</span>
+</span><span id="__span-3-47"><a id="__codelineno-3-47" name="__codelineno-3-47" href="#__codelineno-3-47"></a>        <span class="n">target_metadata</span><span class="o">=</span><span class="n">target_metadata</span><span class="p">,</span>
+</span><span id="__span-3-48"><a id="__codelineno-3-48" name="__codelineno-3-48" href="#__codelineno-3-48"></a>        <span class="n">literal_binds</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+</span><span id="__span-3-49"><a id="__codelineno-3-49" name="__codelineno-3-49" href="#__codelineno-3-49"></a>        <span class="n">dialect_opts</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;paramstyle&quot;</span><span class="p">:</span> <span class="s2">&quot;named&quot;</span><span class="p">},</span>
+</span><span id="__span-3-50"><a id="__codelineno-3-50" name="__codelineno-3-50" href="#__codelineno-3-50"></a>    <span class="p">)</span>
+</span><span id="__span-3-51"><a id="__codelineno-3-51" name="__codelineno-3-51" href="#__codelineno-3-51"></a>
+</span><span id="__span-3-52"><a id="__codelineno-3-52" name="__codelineno-3-52" href="#__codelineno-3-52"></a>    <span class="k">with</span> <span class="n">context</span><span class="o">.</span><span class="n">begin_transaction</span><span class="p">():</span>
+</span><span id="__span-3-53"><a id="__codelineno-3-53" name="__codelineno-3-53" href="#__codelineno-3-53"></a>        <span class="n">context</span><span class="o">.</span><span class="n">run_migrations</span><span class="p">()</span>
+</span><span id="__span-3-54"><a id="__codelineno-3-54" name="__codelineno-3-54" href="#__codelineno-3-54"></a>
+</span><span id="__span-3-55"><a id="__codelineno-3-55" name="__codelineno-3-55" href="#__codelineno-3-55"></a>
+</span><span id="__span-3-56"><a id="__codelineno-3-56" name="__codelineno-3-56" href="#__codelineno-3-56"></a><span class="k">def</span> <span class="nf">run_migrations_online</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-3-57"><a id="__codelineno-3-57" name="__codelineno-3-57" href="#__codelineno-3-57"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Run migrations in &#39;online&#39; mode.</span>
+</span><span id="__span-3-58"><a id="__codelineno-3-58" name="__codelineno-3-58" href="#__codelineno-3-58"></a>
+</span><span id="__span-3-59"><a id="__codelineno-3-59" name="__codelineno-3-59" href="#__codelineno-3-59"></a><span class="sd">    In this scenario we need to create an Engine</span>
+</span><span id="__span-3-60"><a id="__codelineno-3-60" name="__codelineno-3-60" href="#__codelineno-3-60"></a><span class="sd">    and associate a connection with the context.</span>
+</span><span id="__span-3-61"><a id="__codelineno-3-61" name="__codelineno-3-61" href="#__codelineno-3-61"></a>
+</span><span id="__span-3-62"><a id="__codelineno-3-62" name="__codelineno-3-62" href="#__codelineno-3-62"></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="__span-3-63"><a id="__codelineno-3-63" name="__codelineno-3-63" href="#__codelineno-3-63"></a>    <span class="n">connectable</span> <span class="o">=</span> <span class="n">engine_from_config</span><span class="p">(</span>
+</span><span id="__span-3-64"><a id="__codelineno-3-64" name="__codelineno-3-64" href="#__codelineno-3-64"></a>        <span class="n">config</span><span class="o">.</span><span class="n">get_section</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">config_ini_section</span><span class="p">,</span> <span class="p">{}),</span>
+</span><span id="__span-3-65"><a id="__codelineno-3-65" name="__codelineno-3-65" href="#__codelineno-3-65"></a>        <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;sqlalchemy.&quot;</span><span class="p">,</span>
+</span><span id="__span-3-66"><a id="__codelineno-3-66" name="__codelineno-3-66" href="#__codelineno-3-66"></a>        <span class="n">poolclass</span><span class="o">=</span><span class="n">pool</span><span class="o">.</span><span class="n">NullPool</span><span class="p">,</span>
+</span><span id="__span-3-67"><a id="__codelineno-3-67" name="__codelineno-3-67" href="#__codelineno-3-67"></a>    <span class="p">)</span>
+</span><span id="__span-3-68"><a id="__codelineno-3-68" name="__codelineno-3-68" href="#__codelineno-3-68"></a>
+</span><span id="__span-3-69"><a id="__codelineno-3-69" name="__codelineno-3-69" href="#__codelineno-3-69"></a>    <span class="k">with</span> <span class="n">connectable</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span> <span class="k">as</span> <span class="n">connection</span><span class="p">:</span>
+</span><span id="__span-3-70"><a id="__codelineno-3-70" name="__codelineno-3-70" href="#__codelineno-3-70"></a>        <span class="n">context</span><span class="o">.</span><span class="n">configure</span><span class="p">(</span>
+</span><span id="__span-3-71"><a id="__codelineno-3-71" name="__codelineno-3-71" href="#__codelineno-3-71"></a>            <span class="n">connection</span><span class="o">=</span><span class="n">connection</span><span class="p">,</span> <span class="n">target_metadata</span><span class="o">=</span><span class="n">target_metadata</span>
+</span><span id="__span-3-72"><a id="__codelineno-3-72" name="__codelineno-3-72" href="#__codelineno-3-72"></a>        <span class="p">)</span>
+</span><span id="__span-3-73"><a id="__codelineno-3-73" name="__codelineno-3-73" href="#__codelineno-3-73"></a>
+</span><span id="__span-3-74"><a id="__codelineno-3-74" name="__codelineno-3-74" href="#__codelineno-3-74"></a>        <span class="k">with</span> <span class="n">context</span><span class="o">.</span><span class="n">begin_transaction</span><span class="p">():</span>
+</span><span id="__span-3-75"><a id="__codelineno-3-75" name="__codelineno-3-75" href="#__codelineno-3-75"></a>            <span class="n">context</span><span class="o">.</span><span class="n">run_migrations</span><span class="p">()</span>
+</span><span id="__span-3-76"><a id="__codelineno-3-76" name="__codelineno-3-76" href="#__codelineno-3-76"></a>
+</span><span id="__span-3-77"><a id="__codelineno-3-77" name="__codelineno-3-77" href="#__codelineno-3-77"></a>
+</span><span id="__span-3-78"><a id="__codelineno-3-78" name="__codelineno-3-78" href="#__codelineno-3-78"></a><span class="k">if</span> <span class="n">context</span><span class="o">.</span><span class="n">is_offline_mode</span><span class="p">():</span>
+</span><span id="__span-3-79"><a id="__codelineno-3-79" name="__codelineno-3-79" href="#__codelineno-3-79"></a>    <span class="n">run_migrations_offline</span><span class="p">()</span>
+</span><span id="__span-3-80"><a id="__codelineno-3-80" name="__codelineno-3-80" href="#__codelineno-3-80"></a><span class="k">else</span><span class="p">:</span>
+</span><span id="__span-3-81"><a id="__codelineno-3-81" name="__codelineno-3-81" href="#__codelineno-3-81"></a>    <span class="n">run_migrations_online</span><span class="p">()</span>
+</span></code></pre></div>
+</details>
+</li>
+<li>
+<p><strong>В файле <code>script.py.mako</code> импортировать библиотеку <code>sqlmodel</code></strong> </p>
+</li>
+<li>
+<p><strong>Добавить <code>level</code> поле модели <code>SkillWarriorLink</code></strong> 
+    <div class="language-py highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">class</span> <span class="nc">SkillWarriorLink</span><span class="p">(</span><span class="n">SQLModel</span><span class="p">,</span> <span class="n">table</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>    <span class="n">skill_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>    <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">foreign_key</span><span class="o">=</span><span class="s2">&quot;skill.id&quot;</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>    <span class="p">)</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>    <span class="n">warrior_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>    <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">foreign_key</span><span class="o">=</span><span class="s2">&quot;warrior.id&quot;</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span>
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>    <span class="p">)</span>
+</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>    <span class="n">level</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span>
+</span></code></pre></div></p>
+</li>
+<li><strong>Создать файл миграций с помощью команды <code>alembic revision --autogenerate -m "skill added"</code></strong></li>
+<li><strong>Применить миграции с помощью команды <code>alembic upgrade head</code></strong></li>
+</ol>
+<p>Увидеть полученные изменения можно просмотрев поля таблицы через pgAdmin.</p>
+<div class="admonition note">
+<p class="admonition-title">Замечание</p>
+<p>Использование библиотеки alembic и миграций предполагает их описание, как описываются коммиты в гите. 
+При создании файлов миграции рекомендуется писать полезную информацию об изменениях в соответствующей команде
+после маркера <code>-m</code>.</p>
+</div>
 <h2 id="gitignore">Переменные окружения и .gitignore</h2>
-<p>По сранению с Django, FastAPI не требует длительной установки и настройки приложения, чтобы его запустить достаточно
-выполнить несколько простых операций:</p>
-<h2 id="_2">Приведение проекта в порядок</h2>
-<p>По сранению с Django, FastAPI не требует длительной установки и настройки приложения, чтобы его запустить достаточно
-выполнить несколько простых операций:</p>
-<h2 id="_3">Практическое задание</h2>
+<p>Настройка проекта и .env</p>
+<h2 id="_1">Приведение проекта в порядок</h2>
+<p>папки переменны и т.д.</p>
+<h2 id="_2">Практическое задание</h2>
 <p>Реализовать все на своем примере, придумать структуру проекта</p>
 
 
