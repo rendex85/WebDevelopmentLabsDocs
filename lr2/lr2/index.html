@@ -62,7 +62,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#welcome-to-mkdocs" class="md-skip">
+        <a href="#2-fastapi" class="md-skip">
           Skip to content
         </a>
       
@@ -298,9 +298,45 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#commands" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Commands
+      Цели
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      Выбор темы
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      Задание
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      Отчет
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      Дополнительное здание
     </span>
   </a>
   
@@ -400,15 +436,87 @@
                   
 
 
-<h1 id="welcome-to-mkdocs">Welcome to MkDocs</h1>
+<h1 id="2-fastapi">Лабораторная работа 2. Реализация серверного приложения FastAPI</h1>
 <blockquote>
-<p><strong>Для выполнения лабораторной и всех практических работ рекомендуется использовать версию Python 3.10+</strong>
-For full documentation visit <a href="https://www.mkdocs.org">mkdocs.org</a>.</p>
+<p><strong>Для выполнения лабораторной и всех практических работ рекомендуется использовать версию Python 3.10+</strong></p>
 </blockquote>
-<h2 id="commands">Commands</h2>
-<p>Делать все асинхронно.
-взять задание из второй или третьей лабы. Реализовать круд, реализовать миграции, настроить структура проекта и хранение
-секретов, проаннотировать весь код</p>
+<h2 id="_1">Цели</h2>
+<p>Научится реализовывать полноценное серверное приложение с помощью фреймворка FastAPI с применением 
+дополнительных средств и библиотек.</p>
+<h2 id="_2">Выбор темы</h2>
+<p>Тут надо обсудить</p>
+<p><strong>Критерии модели данных:</strong></p>
+<ol>
+<li>5 или больше таблиц</li>
+<li>Связи many-to-many и one-to-many</li>
+<li>Ассоциативная сущность должна иметь поле, характеризующее связь, помимо ссылок на связанные таблицы</li>
+</ol>
+<h2 id="_3">Задание</h2>
+<ol>
+<li>
+<p><strong>Выполнить практики 2.1-2.3</strong> Их можно реализовать на примере, приведенном в текстах практик или используя выбранную
+   тему. Практики можно предоставить в любом из ниже приведенных вариантов:</p>
+<ol>
+<li>Каждая практика - отдельная папка в репозитории.</li>
+<li>Каждая практика - отдельная ветка в репозитории.</li>
+<li>Каждая практика - отдельный коммит в репозитории.</li>
+</ol>
+</li>
+<li>
+<p><strong>Задание на 9 Баллов:</strong> Реализовать на основании выбранной модели и заданий из практик серверное приложение на
+   FastAPI. Оно должно включать в себя:</p>
+<ol>
+<li>Таблицы, реализованные с помощью ORM SQLAlchemy или SQLModel с использованием БД PostgreSQL.</li>
+<li>API, содержащее <a href="https://ru.wikipedia.org/wiki/CRUD">CRUD-ы</a>. Там где это необходимо, реализовать GET-запросы
+  возвращающие модели с вложенными объектами (связи many-to-many и one-to-many).</li>
+<li>Настроенную систему миграций с помощью библиотеки Alembic.</li>
+<li>Аннотацию типов в передаваемых и возвращаемых значениях в API-методах.</li>
+<li>Оформленную файловую структуру проекта с разделением кода, отвечающего за разную бизнес-логику и предметную
+  область, на отдельные файлы и папки.</li>
+<li><em>(опционально) Комментарии к сложным частям кода</em>.</li>
+</ol>
+</li>
+<li>
+<p><strong>Задание на 15 Баллов (можно реализовывать сразу):</strong> Реализовать задание из п.2 в асинхронном варианте.</p>
+<ol>
+<li>Изучить <a href="https://testdriven.io/blog/fastapi-sqlmodel/">гайд по настройке асинхронной реализации FastAPI</a></li>
+<li>Реализовать асинхронное подключение к БД с использованием asyncpg.</li>
+<li>Реализовать в асинхронном формате все эндпоинты из п.2</li>
+<li>Сделать асинхронные миграции</li>
+</ol>
+<div class="admonition note">
+<p class="admonition-title">Замечание</p>
+<p>Если вы реализуете код для подключения к БД по инструкции из пункта 3.а, для новых версий SQLAlchemy необходимо 
+корректно импортировать <code>AsyncEngine</code> и сопутсвующие библиотеки:
+<div class="language-py highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span> <span class="nn">sqlalchemy.ext.asyncio</span> <span class="kn">import</span> <span class="n">AsyncEngine</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="kn">from</span> <span class="nn">sqlmodel</span> <span class="kn">import</span> <span class="n">SQLModel</span><span class="p">,</span> <span class="n">create_engine</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="kn">from</span> <span class="nn">sqlmodel.ext.asyncio.session</span> <span class="kn">import</span> <span class="n">AsyncSession</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="kn">import</span> <span class="n">sessionmaker</span>
+</span></code></pre></div></p>
+</div>
+</li>
+</ol>
+<h2 id="_4">Отчет</h2>
+<p>Отчет по лабораторной должен содержать все реализованные эндпоинты, модели и код соединения с БД. В отчете можно 
+указать исключительно финальную версию кода. Отчет должен содержать ссылки на github c папками, коммитами или ветками 
+выполненных практик.  </p>
+<h2 id="_5">Дополнительное здание</h2>
+<div class="admonition warning">
+<p class="admonition-title">Внимание!</p>
+<p>Выполнение дополнительного задания возможно только после защиты ЛР 2 на 15 баллов!</p>
+</div>
+<p><strong>Данное задание может выполнено вместо 3ей лабораторной работы</strong></p>
+<p><strong>Задание:</strong> Необходимо реализовать функционал пользователя в разрабатываемом приложении. Функционал включает в себя:</p>
+<ol>
+<li>Авторизацию и регистрацию</li>
+<li>Генерацию JWT-токенов</li>
+<li>Аутентификацию по JWT-токену</li>
+<li>Хэширование паролей</li>
+<li>Дополнительные АПИ-методы для получения информации о пользователе, списка пользователей и смене пароля</li>
+<li>Асинхронность вышеперчисленного функкционала</li>
+</ol>
+<p>Выполнение и защита такого задния приравнивается к выполнению третьей лабораторной работы</p>
 
 
 

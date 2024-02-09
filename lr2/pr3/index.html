@@ -374,19 +374,34 @@
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_1" class="md-nav__link">
+    <nav class="md-nav" aria-label="Переменные окружения и .gitignore">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#gitignore_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Приведение проекта в порядок
+      .gitignore
     </span>
   </a>
   
 </li>
+        
+          <li class="md-nav__item">
+  <a href="#env" class="md-nav__link">
+    <span class="md-ellipsis">
+      .env
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
       
         <li class="md-nav__item">
-  <a href="#_2" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
       Практическое задание
     </span>
@@ -568,7 +583,8 @@
 <li><strong>Создать файл миграций с помощью команды <code>alembic revision --autogenerate -m "skill added"</code></strong></li>
 <li><strong>Применить миграции с помощью команды <code>alembic upgrade head</code></strong></li>
 </ol>
-<p>Увидеть полученные изменения можно просмотрев поля таблицы через pgAdmin.</p>
+<p>Увидеть полученные изменения можно просмотрев поля таблицы через pgAdmin. Файлы миграций хранятся в 
+.migrations/versions.</p>
 <div class="admonition note">
 <p class="admonition-title">Замечание</p>
 <p>Использование библиотеки alembic и миграций предполагает их описание, как описываются коммиты в гите. 
@@ -576,11 +592,89 @@
 после маркера <code>-m</code>.</p>
 </div>
 <h2 id="gitignore">Переменные окружения и .gitignore</h2>
-<p>Настройка проекта и .env</p>
-<h2 id="_1">Приведение проекта в порядок</h2>
-<p>папки переменны и т.д.</p>
-<h2 id="_2">Практическое задание</h2>
-<p>Реализовать все на своем примере, придумать структуру проекта</p>
+<p>При разработке приложений часто необходимо хранить ключи и пароли от БД и различного АПИ, к которому обращается
+сервер. В больших проектах часто используются специальные хранилища
+типа  <a href="https://www.vaultproject.io/">Hashicorp Vault</a>
+или <a href="https://docs.github.com/ru/actions/security-guides/using-secrets-in-github-actions">GitGub Secrets</a> для
+хранения подобной информации, но если разработка небольшая, то прятать важные данные можно посредством <code>.env</code> файлов.</p>
+<p>env-файлы - специальные файлы, имеющие которые <code>.env</code> расширение. Служат для изоляции приложения от среды, где оно
+запускается. Они не должны
+индексироваться системами контроля версий т.к. хранят чувствительную информацию о проекте.</p>
+<div class="admonition warning">
+<p class="admonition-title">Внимание!</p>
+<p>Не стоит путать env-файлы  с <code>venv</code> (Виртуальным окружением) языка Python</p>
+</div>
+<h3 id="gitignore_1">.gitignore</h3>
+<p>Такие файлы необходимо реализовывать с учетом используемой системы контроля версий. При использовании Git необходимо
+создать специальный .gitignore-файл, исключающий индексацию таких файлов при разработке проекта.</p>
+<div class="admonition note">
+<p class="admonition-title">Замечание</p>
+<p>.gitignore-файлы используются для исключения из индексации лишних элементов внутри файловой структуры системы, не
+только файлов с чувствительной информацией. Обычно, исключаются все файлы влияющие на окружение, IDE и
+файлы БД.</p>
+</div>
+<p>У gitignore-файлов довольно простой синтаксис, ознакомится с ним можно в 
+<a href="https://git-scm.com/docs/gitignore">документации</a>. Обычно, для типовых проектов существуют готовые шаблоны подобных 
+файлов -  они легко ищутся через поисковые системы. </p>
+<details class="abstract">
+<summary>Пример подобного файла для FastAPI-проекта</summary>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>.idea
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>.ipynb_checkpoints
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>.mypy_cache
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>.vscode
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>__pycache__
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>.pytest_cache
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>htmlcov
+</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>dist
+</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>site
+</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>.coverage
+</span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a>coverage.xml
+</span><span id="__span-5-12"><a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a>.netlify
+</span><span id="__span-5-13"><a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a>test.db
+</span><span id="__span-5-14"><a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a>log.txt
+</span><span id="__span-5-15"><a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a>Pipfile.lock
+</span><span id="__span-5-16"><a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a>env3.*
+</span><span id="__span-5-17"><a id="__codelineno-5-17" name="__codelineno-5-17" href="#__codelineno-5-17"></a>env
+</span><span id="__span-5-18"><a id="__codelineno-5-18" name="__codelineno-5-18" href="#__codelineno-5-18"></a>docs_build
+</span><span id="__span-5-19"><a id="__codelineno-5-19" name="__codelineno-5-19" href="#__codelineno-5-19"></a>site_build
+</span><span id="__span-5-20"><a id="__codelineno-5-20" name="__codelineno-5-20" href="#__codelineno-5-20"></a>venv
+</span><span id="__span-5-21"><a id="__codelineno-5-21" name="__codelineno-5-21" href="#__codelineno-5-21"></a>docs.zip
+</span><span id="__span-5-22"><a id="__codelineno-5-22" name="__codelineno-5-22" href="#__codelineno-5-22"></a>archive.zip
+</span><span id="__span-5-23"><a id="__codelineno-5-23" name="__codelineno-5-23" href="#__codelineno-5-23"></a>
+</span><span id="__span-5-24"><a id="__codelineno-5-24" name="__codelineno-5-24" href="#__codelineno-5-24"></a># vim temporary files
+</span><span id="__span-5-25"><a id="__codelineno-5-25" name="__codelineno-5-25" href="#__codelineno-5-25"></a>*~
+</span><span id="__span-5-26"><a id="__codelineno-5-26" name="__codelineno-5-26" href="#__codelineno-5-26"></a>.*.sw?
+</span><span id="__span-5-27"><a id="__codelineno-5-27" name="__codelineno-5-27" href="#__codelineno-5-27"></a>.cache
+</span><span id="__span-5-28"><a id="__codelineno-5-28" name="__codelineno-5-28" href="#__codelineno-5-28"></a>
+</span><span id="__span-5-29"><a id="__codelineno-5-29" name="__codelineno-5-29" href="#__codelineno-5-29"></a># macOS
+</span><span id="__span-5-30"><a id="__codelineno-5-30" name="__codelineno-5-30" href="#__codelineno-5-30"></a>.DS_Store
+</span></code></pre></div>
+</details>
+<p>Для исключения <code>.env</code> файла необходимо создать <code>.gitignore</code> файл и всписать в него строку "<code>*.env</code>", таким
+образом исключив все варианты расположения файлов с подобным расширением.</p>
+<p>После того</p>
+<h3 id="env">.env</h3>
+<p>По аналогии с <code>.gitignore</code> необходимо создать файл <code>.env</code> в корне проекта и вписать туда переменную с чувствительными 
+данными. В случае описываемого проекта это URL базы данных:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>DB_ADMIN = postgresql://postgres:123@localhost/warriors_db
+</span></code></pre></div>
+<p>Чтобы получить данные из такого файла можно воспользоваться пакетом python-dotenv, для этого его надо установить:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>pip install python-dotenv
+</span></code></pre></div>
+<p>После установки, в файле <code>connetion.py</code> адрес БД с использованием переменных окружения должен указываться
+следующим образом:</p>
+<div class="language-py highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="kn">import</span> <span class="nn">os</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="kn">from</span> <span class="nn">dotenv</span> <span class="kn">import</span> <span class="n">load_dotenv</span>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="n">load_dotenv</span><span class="p">()</span>
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="n">db_url</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;DB_ADMIN&#39;</span><span class="p">)</span>
+</span></code></pre></div>
+<h2 id="_1">Практическое задание</h2>
+<ol>
+<li>Реализовать в своем проекте все улучшения, описанные в практике</li>
+<li><a href="https://alembic.sqlalchemy.org/en/latest/api/config.html">Разобраться</a> как передать в alembic.ini URL базы данных с
+   помощью<code>.env</code>-файла и реализовать подобную передачу.</li>
+</ol>
 
 
 
