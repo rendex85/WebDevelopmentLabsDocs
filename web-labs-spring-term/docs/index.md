@@ -1,17 +1,13 @@
-# Welcome to MkDocs
+# Доки для лаб
 
-For full documentation visit [mkdocs.org](https://www.mkdocs.org).
+Тут должно быть красивее и больше и круче, но это пока все что я успел подготовить. В дальнейшем (надеюсь) тут будет
+много
+всякого разного.
 
-## Commands
+## Как связаться
 
-* `mkdocs new [dir-name]` - Create a new project.
-* `mkdocs serve` - Start the live-reloading docs server.
-* `mkdocs build` - Build the documentation site.
-* `mkdocs -h` - Print help message and exit.
+Сергей (ментор)
 
-## Project layout
+* tg: @EB0B0h
+* e-mail: sakoriakov@itmo.ru
 
-    mkdocs.yml    # The configuration file.
-    docs/
-        index.md  # The documentation homepage.
-        ...       # Other markdown pages, images and other files.
