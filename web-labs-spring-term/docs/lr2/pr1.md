@@ -95,7 +95,7 @@ API-взаимодействия внутри фреймворка. В каче�
         },
     },
         {
-            "id": 1,
+            "id": 2,
             "race": "worker",
             "name": "Андрей Косякин",
             "level": 12,
@@ -163,9 +163,9 @@ def warrior_delete(warrior_id: int):
 ```py
 @app.put("/warrior{warrior_id}")
 def warrior_update(warrior_id: int, warrior: dict):
-    for war in temp_bd:
+    for i, war in enumerate(temp_bd):
         if war.get("id") == warrior_id:
-            war = warrior
+            temp_bd[i] = warrior
     return temp_bd
 ```
 
