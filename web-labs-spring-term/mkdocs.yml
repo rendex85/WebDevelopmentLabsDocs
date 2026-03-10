@@ -21,7 +21,7 @@ theme:
     - toc.integrate
 nav:
   - Главная: index.md
-  - ЛР2:
+  - ЛР1:
       - Текст лабораторной: lr2/lr2.md
       - Практика 1: lr2/pr1.md
       - Практика 2: lr2/pr2.md
